@@ -1,7 +1,7 @@
 package android.template.testdi
 
 import android.app.Application
-import android.template.data.datasource.MyApplicationDatabase
+import android.template.data.datasource.AppDatabase
 import android.template.data.repository.MyModelRepositoryImpl
 import android.template.domain.repository.MyModelRepository
 import android.template.domain.usecases.MyModelUseCases
@@ -22,16 +22,16 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    fun provideMyApplicationDatabase(app: Application): MyApplicationDatabase {
+    fun provideMyApplicationDatabase(app: Application): AppDatabase {
         return Room.inMemoryDatabaseBuilder(
             app,
-            MyApplicationDatabase::class.java,
+            AppDatabase::class.java,
         ).build()
     }
 
     @Provides
     @Singleton
-    fun provideMyModelRepository(db: MyApplicationDatabase): MyModelRepository {
+    fun provideMyModelRepository(db: AppDatabase): MyModelRepository {
         return MyModelRepositoryImpl(db.myModelDao)
     }
 

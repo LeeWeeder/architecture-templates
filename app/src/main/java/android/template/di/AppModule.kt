@@ -1,7 +1,7 @@
 package android.template.di
 
 import android.app.Application
-import android.template.data.datasource.MyApplicationDatabase
+import android.template.data.datasource.AppDatabase
 import android.template.data.repository.MyModelRepositoryImpl
 import android.template.domain.repository.MyModelRepository
 import android.template.domain.usecases.MyModelUseCases
@@ -21,17 +21,17 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun providesMyApplicationDatabase(app: Application): MyApplicationDatabase {
+    fun providesMyApplicationDatabase(app: Application): AppDatabase {
         return Room.databaseBuilder(
             app,
-            MyApplicationDatabase::class.java,
-            MyApplicationDatabase.DATABASE_NAME
+            AppDatabase::class.java,
+            AppDatabase.DATABASE_NAME
         ).build()
     }
 
     @Provides
     @Singleton
-    fun provideMyModelRepository(db: MyApplicationDatabase): MyModelRepository {
+    fun provideMyModelRepository(db: AppDatabase): MyModelRepository {
         return MyModelRepositoryImpl(db.myModelDao)
     }
 

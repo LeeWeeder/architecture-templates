@@ -8,10 +8,10 @@ import androidx.room.RoomDatabase
     entities = [MyModel::class],
     version = 1
 )
-abstract class MyApplicationDatabase: RoomDatabase() {
+abstract class AppDatabase: RoomDatabase() {
     abstract val myModelDao: MyModelDao
 
     companion object {
-        const val DATABASE_NAME = "my_application_db"
+        const val DATABASE_NAME = "app_db"
     }
 }
