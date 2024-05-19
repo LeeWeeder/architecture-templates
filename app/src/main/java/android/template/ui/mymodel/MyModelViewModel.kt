@@ -16,40 +16,68 @@
 
 package android.template.ui.mymodel
 
+import android.template.domain.usecases.MyModelUseCases
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import android.template.data.MyModelRepository
-import android.template.ui.mymodel.MyModelUiState.Error
-import android.template.ui.mymodel.MyModelUiState.Loading
-import android.template.ui.mymodel.MyModelUiState.Success
 import javax.inject.Inject
 
 @HiltViewModel
 class MyModelViewModel @Inject constructor(
-    private val myModelRepository: MyModelRepository
+    private val myModelUseCases: MyModelUseCases
 ) : ViewModel() {
 
-    val uiState: StateFlow<MyModelUiState> = myModelRepository
-        .myModels.map<List<String>, MyModelUiState>(::Success)
-        .catch { emit(Error(it)) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
+    private val _myModelUiState = mutableStateOf(MyModelUiState())
+    val myModelUiState: State<MyModelUiState> = _myModelUiState
 
-    fun addMyModel(name: String) {
-        viewModelScope.launch {
-            myModelRepository.add(name)
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
+    private var getMyModelsJob: Job? = null
+
+    init {
+        getMyModels()
+    }
+
+
+    fun onEvent(event: MyModelEvent) {
+        when (event) {
+            is MyModelEvent.UpsertMyModel -> {
+                viewModelScope.launch {
+                    try {
+                        myModelUseCases.upsertMyModel(
+                            event.myModel
+                        )
+                        _eventFlow.emit(UiEvent.SaveMyModel)
+                    } catch (e: Exception) {
+                        _eventFlow.emit(UiEvent.ShowMessage("Couldn't save myModel"))
+                    }
+                }
+            }
         }
     }
-}
 
-sealed interface MyModelUiState {
-    object Loading : MyModelUiState
-    data class Error(val throwable: Throwable) : MyModelUiState
-    data class Success(val data: List<String>) : MyModelUiState
+    private fun getMyModels() {
+        getMyModelsJob?.cancel()
+        getMyModelsJob = myModelUseCases.getMyModels()
+            .onEach { myModels ->
+                _myModelUiState.value = myModelUiState.value.copy(
+                    myModels = myModels
+                )
+            }
+            .launchIn(viewModelScope)
+    }
+
+    sealed class UiEvent {
+        data object SaveMyModel : UiEvent()
+        data class ShowMessage(val string: String): UiEvent()
+    }
 }

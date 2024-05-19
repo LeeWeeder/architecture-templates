@@ -16,21 +16,23 @@
 
 package android.template.ui
 
-import androidx.compose.foundation.layout.padding
+import android.template.ui.mymodel.MyModelScreen
+import android.template.util.Screen
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.compositionLocalOf
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import android.template.ui.mymodel.MyModelScreen
+
+val LocalNavController =
+    compositionLocalOf<NavHostController> { error("NavHostController error") }
 
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "main") {
-        composable("main") { MyModelScreen(modifier = Modifier.padding(16.dp)) }
-        // TODO: Add more destinations
+    NavHost(navController = navController, startDestination = Screen.MyModelScreen.route) {
+        composable(Screen.MyModelScreen.route) { MyModelScreen() }
     }
 }

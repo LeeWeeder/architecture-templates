@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-@Suppress("DSL_SCOPE_VIOLATION") // Remove when fixed https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.ksp)
 }
@@ -29,7 +27,7 @@ android {
 
     defaultConfig {
         applicationId = "android.template"
-        minSdk = 21
+        minSdk = 34
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -39,7 +37,6 @@ android {
             useSupportLibrary = true
         }
 
-        // Enable room auto-migrations
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
@@ -73,7 +70,7 @@ android {
         kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -90,16 +87,17 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     // Hilt and instrumented tests.
     androidTestImplementation(libs.hilt.android.testing)
-    kaptAndroidTest(libs.hilt.android.compiler)
+    kspAndroidTest(libs.hilt.android.compiler)
     // Hilt and Robolectric tests.
     testImplementation(libs.hilt.android.testing)
-    kaptTest(libs.hilt.android.compiler)
+    kspTest(libs.hilt.android.compiler)
 
     // Arch Components
     implementation(libs.androidx.lifecycle.runtime.compose)

@@ -1,4 +1,4 @@
-package android.template.testdi
+package android.template.di
 
 import android.app.Application
 import android.template.data.datasource.MyApplicationDatabase
@@ -18,14 +18,14 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object TestAppModule {
-
+object AppModule {
     @Provides
     @Singleton
-    fun provideMyApplicationDatabase(app: Application): MyApplicationDatabase {
-        return Room.inMemoryDatabaseBuilder(
+    fun providesMyApplicationDatabase(app: Application): MyApplicationDatabase {
+        return Room.databaseBuilder(
             app,
             MyApplicationDatabase::class.java,
+            MyApplicationDatabase.DATABASE_NAME
         ).build()
     }
 

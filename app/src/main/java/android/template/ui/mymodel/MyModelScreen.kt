@@ -16,7 +16,8 @@
 
 package android.template.ui.mymodel
 
-import android.template.ui.theme.MyApplicationTheme
+import android.template.domain.model.MyModel
+import android.template.ui.LocalNavController
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,33 +33,31 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun MyModelScreen(modifier: Modifier = Modifier, viewModel: MyModelViewModel = hiltViewModel()) {
-    val items by viewModel.uiState.collectAsStateWithLifecycle()
-    if (items is MyModelUiState.Success) {
-        MyModelScreen(
-            items = (items as MyModelUiState.Success).data,
-            onSave = viewModel::addMyModel,
-            modifier = modifier
-        )
-    }
+fun MyModelScreen(viewModel: MyModelViewModel = hiltViewModel()) {
+    val uiState = viewModel.myModelUiState.value
+    MyModelScreen(
+        uiState = uiState,
+        onEvent = viewModel::onEvent
+    )
 }
 
 @Composable
 internal fun MyModelScreen(
-    items: List<String>,
-    onSave: (name: String) -> Unit,
-    modifier: Modifier = Modifier
+    uiState: MyModelUiState,
+    onEvent: (MyModelEvent) -> Unit
 ) {
-    Column(modifier) {
+    val navController = LocalNavController.current
+    val myModels = uiState.myModels
+    Column {
         var nameMyModel by remember { mutableStateOf("Compose") }
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             TextField(
@@ -66,30 +65,18 @@ internal fun MyModelScreen(
                 onValueChange = { nameMyModel = it }
             )
 
-            Button(modifier = Modifier.width(96.dp), onClick = { onSave(nameMyModel) }) {
+            Button(modifier = Modifier.width(96.dp), onClick = {
+                onEvent(
+                    MyModelEvent.UpsertMyModel(
+                        MyModel(nameMyModel)
+                    )
+                )
+            }) {
                 Text("Save")
             }
         }
-        items.forEach {
+        myModels.forEach {
             Text("Saved item: $it")
         }
-    }
-}
-
-// Previews
-
-@Preview(showBackground = true)
-@Composable
-private fun DefaultPreview() {
-    MyApplicationTheme {
-        MyModelScreen(listOf("Compose", "Room", "Kotlin"), onSave = {})
-    }
-}
-
-@Preview(showBackground = true, widthDp = 480)
-@Composable
-private fun PortraitPreview() {
-    MyApplicationTheme {
-        MyModelScreen(listOf("Compose", "Room", "Kotlin"), onSave = {})
     }
 }
