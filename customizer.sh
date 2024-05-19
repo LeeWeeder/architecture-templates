@@ -79,6 +79,9 @@ find ./ -name "mymodel" -type d  | sed "p;s/mymodel/${DATAMODEL,,}/" |  tr '\n' 
 if [[ $APPNAME ]]
 then
     echo "Renaming app to $APPNAME"
+    app_name_resource_path="app/src/main/res/values/strings.xml"
+    sed -i "s/'MyApplication'/$APPNAME/g" "app_name_resource_path"
+    APPNAME=${APPNAME// /}
     find ./ -type f \( -name "MyApplication.kt" -or -name "settings.gradle.kts" -or -name "*.xml" \) -exec sed -i.bak "s/MyApplication/$APPNAME/g" {} \;
     find ./ -name "MyApplication.kt" | sed "p;s/MyApplication/$APPNAME/" | tr '\n' '\0' | xargs -0 -n 2 mv
     find . -name "*.bak" -type f -delete
