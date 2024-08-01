@@ -16,6 +16,7 @@
 
 package android.template.ui.mymodel
 
+import android.template.domain.model.MyModel
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -38,7 +39,7 @@ class MyModelScreenTest {
     @Before
     fun setup() {
         composeTestRule.setContent {
-            MyModelScreen(FAKE_DATA, onSave = {})
+            MyModelScreen(uiState = MyModelUiState(FAKE_DATA.map { MyModel(it) }), onEvent = {})
         }
     }
 
