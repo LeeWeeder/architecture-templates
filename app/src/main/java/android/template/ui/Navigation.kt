@@ -19,6 +19,7 @@ package android.template.ui
 import android.template.ui.mymodel.MyModelScreen
 import android.template.util.Screen
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -32,7 +33,9 @@ val LocalNavController =
 fun MainNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.MyModelScreen.route) {
-        composable(Screen.MyModelScreen.route) { MyModelScreen() }
+    CompositionLocalProvider(value = LocalNavController provides navController) {
+        NavHost(navController = navController, startDestination = Screen.MyModelScreen.route) {
+            composable(Screen.MyModelScreen.route) { MyModelScreen() }
+        }
     }
 }
