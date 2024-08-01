@@ -84,6 +84,7 @@ then
     find ./ -type f \( -name "MyApplication.kt" -or -name "settings.gradle.kts" -or -name "*.xml" \) -exec sed -i.bak "s/MyApplication/$APPNAME/g" {} \;
     find ./ -name "MyApplication.kt" | sed "p;s/MyApplication/$APPNAME/" | tr '\n' '\0' | xargs -0 -n 2 mv
     find . -name "*.bak" -type f -delete
+    find . -name "Theme.kt" -exec sed -i s/MyApplication/$APPNAME/g {} \;
 fi
 
 # Remove additional files
